@@ -23,13 +23,14 @@ package org.eclipse.tractusx.puris.backend.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.tractusx.puris.backend.model.Order;
-import org.eclipse.tractusx.puris.backend.model.repo.OrderPositionRepository;
-import org.eclipse.tractusx.puris.backend.model.repo.OrderRepository;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.eclipse.tractusx.puris.backend.repository.OrderPositionRepository;
+import org.eclipse.tractusx.puris.backend.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for creating and managing Orders/Call-offs.

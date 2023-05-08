@@ -21,7 +21,7 @@
 package org.eclipse.tractusx.puris.backend.service;
 
 import org.eclipse.tractusx.puris.backend.model.ExternalConnector;
-import org.eclipse.tractusx.puris.backend.model.repo.ExternalConnectorRepository;
+import org.eclipse.tractusx.puris.backend.repository.ExternalConnectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

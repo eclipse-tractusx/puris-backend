@@ -18,24 +18,15 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.model.repo;
+package org.eclipse.tractusx.puris.backend.repository;
 
-import org.eclipse.tractusx.puris.backend.model.OrderPosition;
-import java.util.Optional;
+import org.eclipse.tractusx.puris.backend.model.ExternalConnector;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * JPA Repository for {@link OrderPosition} entities.
+ * JPA Repository for {@link ExternalConnector} entities.
  */
 @Repository
-public interface OrderPositionRepository extends JpaRepository<OrderPosition, Long> {
-
-  /**
-   * Find an orderPosition by its positionId.
-   *
-   * @param positionId positionId to search for.
-   * @return Optional containing orderPosition, if it exists.
-   */
-  Optional<OrderPosition> findByPositionId(String positionId);
+public interface ExternalConnectorRepository extends JpaRepository<ExternalConnector, Long> {
 }

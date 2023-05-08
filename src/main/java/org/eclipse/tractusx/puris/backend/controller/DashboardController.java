@@ -22,7 +22,7 @@ package org.eclipse.tractusx.puris.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.tractusx.puris.backend.model.repo.OrderRepository;
+import org.eclipse.tractusx.puris.backend.repository.OrderRepository;
 import org.eclipse.tractusx.puris.backend.service.EdcAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;

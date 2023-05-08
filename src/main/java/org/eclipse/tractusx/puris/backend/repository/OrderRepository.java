@@ -18,12 +18,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.model.repo;
+package org.eclipse.tractusx.puris.backend.repository;
 
 import org.eclipse.tractusx.puris.backend.model.Order;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * JPA Repository for {@link Order} entities.

@@ -3,6 +3,7 @@ package org.eclipse.tractusx.puris.backend.masterdata.domain.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.eclipse.tractusx.puris.backend.stock.domain.model.PartnerProductStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock;
 
 import java.util.List;
@@ -45,4 +46,9 @@ public class Partner {
     @ToString.Exclude
     @Setter(AccessLevel.NONE)
     private List<ProductStock> allocatedProductStocksForCustomer;
+
+    @OneToMany(mappedBy = "uuid")
+    @ToString.Exclude
+    @Setter(AccessLevel.NONE)
+    private List<PartnerProductStock> partnerProductStocks;
 }

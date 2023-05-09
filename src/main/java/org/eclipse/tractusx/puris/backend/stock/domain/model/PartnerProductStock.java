@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
@@ -15,6 +16,7 @@ import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
 @Getter
 @Setter
 @ToString(callSuper = true)
+@NoArgsConstructor
 public class PartnerProductStock extends Stock {
 
     @ManyToOne

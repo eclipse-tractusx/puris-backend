@@ -4,6 +4,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -19,5 +20,6 @@ public class ProductStock extends Stock {
     @ManyToOne
     @JoinColumn(name = "partner_uuid")
     @ToString.Exclude
+    @NotNull
     private Partner allocatedToCustomerPartner;
 }

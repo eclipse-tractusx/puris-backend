@@ -11,11 +11,14 @@ import org.eclipse.tractusx.puris.backend.stock.domain.model.datatype.DT_StockTy
 import java.util.Date;
 import java.util.UUID;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "stock_type")
 @Getter
 @Setter
+@ToString
 public class Stock {
-    //Todo Check if DiscriminatorColumn for type is better way to differentiate between Product and Material Stock than Stock.type https://www.baeldung.com/hibernate-inheritance
+
     @Id
     @GeneratedValue
     private UUID uuid;
@@ -23,22 +26,13 @@ public class Stock {
     @ManyToOne
     @JoinColumn(name = "material_uuid")
     @NotNull
-    @ToString.Exclude
     private Material material;
 
     @NotNull
     private double quantity;
 
-    // TODO: do we need the stock.siteBpns?
-    /*
-    @ManyToOne
-    @JoinColumn(name = "partner_uuid")
-    @NotNull
-    private Partner owningPartner;
-    */
     @NotNull
     private String atSiteBpnl;
-
 
     @Enumerated(EnumType.STRING)
     @NotNull

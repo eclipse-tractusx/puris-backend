@@ -2,12 +2,11 @@ package org.eclipse.tractusx.puris.backend.masterdata.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -15,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class Partner {
 
     @Id
@@ -31,20 +31,18 @@ public class Partner {
 
     @ManyToMany(mappedBy = "suppliedByPartners")
     @ToString.Exclude
-    private List<Material> suppliesMaterials;
+    @Setter(AccessLevel.NONE)
+    private Set<Material> suppliesMaterials;
+    ;
 
     @ManyToMany(mappedBy = "orderedByPartners")
     @ToString.Exclude
-    private List<Material> ordersProducts;
+    @Setter(AccessLevel.NONE)
+    private Set<Material> ordersProducts;
+    ;
 
     @OneToMany(mappedBy = "uuid")
     @ToString.Exclude
+    @Setter(AccessLevel.NONE)
     private List<ProductStock> allocatedProductStocksForCustomer;
-
-    /*
-    @OneToMany(mappedBy = "owningPartner")
-    @NotNull
-    private List<Stock> hasStocks;
-    */
-
 }

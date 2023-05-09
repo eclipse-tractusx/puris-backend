@@ -1,11 +1,11 @@
 package org.eclipse.tractusx.puris.backend.masterdata.domain.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.eclipse.tractusx.puris.backend.stock.domain.model.Stock;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -13,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class Material {
 
     @Id
@@ -26,7 +27,9 @@ public class Material {
             inverseJoinColumns = @JoinColumn(name = "partner_uuid")
     )
     @ToString.Exclude
-    private List<Partner> suppliedByPartners;
+    @Setter(AccessLevel.NONE)
+    private Set<Partner> suppliedByPartners;
+    ;
 
     @ManyToMany
     @JoinTable(
@@ -35,11 +38,13 @@ public class Material {
             inverseJoinColumns = @JoinColumn(name = "partner_uuid")
     )
     @ToString.Exclude
-    private List<Partner> orderedByPartners;
+    @Setter(AccessLevel.NONE)
+    private Set<Partner> orderedByPartners;
 
     @OneToMany(mappedBy = "uuid")
     @ToString.Exclude
-    private List<Material> materialOnStocks;
+    @Setter(AccessLevel.NONE)
+    private List<Stock> materialOnStocks;
 
     /**
      * If true, then the Material is a material (input for production / something I buy).

@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MaterialRepository extends JpaRepository<Material, UUID> {
-    //TODO: Decide if Material and Product should be two different repositories.
 
     List<Material> findAllByMaterialFlagIsTrue();
 

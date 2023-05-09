@@ -7,10 +7,14 @@ import org.eclipse.tractusx.puris.backend.masterdata.logic.dto.PartnerDto;
 import org.eclipse.tractusx.puris.backend.masterdata.logic.service.MaterialService;
 import org.eclipse.tractusx.puris.backend.masterdata.logic.service.PartnerService;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.MaterialStock;
+import org.eclipse.tractusx.puris.backend.stock.domain.model.PartnerProductStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock;
+import org.eclipse.tractusx.puris.backend.stock.domain.model.Stock;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.MaterialStockDto;
+import org.eclipse.tractusx.puris.backend.stock.logic.dto.PartnerProductStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.MaterialStockService;
+import org.eclipse.tractusx.puris.backend.stock.logic.service.PartnerProductStockService;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.ProductStockService;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -19,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -40,6 +43,9 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
 
     @Autowired
     private ProductStockService productStockService;
+
+    @Autowired
+    private PartnerProductStockService partnerProductStockService;
 
     private static final Logger log = LoggerFactory.getLogger(PurisApplication.class);
 
@@ -71,9 +77,7 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
                 "BPNL1234567890ZZ",
                 "BPNS1234567890ZZ"
         );
-        List<MaterialDto> suppliesMaterial = new ArrayList<MaterialDto>();
-        suppliesMaterial.add(semiconductorDto);
-        supplierPartnerDto.setSuppliesMaterials(suppliesMaterial);
+        supplierPartnerDto.addSuppliedMaterial(semiconductorDto);
         Partner supplierPartnerEntity = modelMapper.map(supplierPartnerDto, Partner.class);
         supplierPartnerEntity = partnerService.create(supplierPartnerEntity);
 
@@ -112,11 +116,10 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
                 "BPNL4444444444XX",
                 "BPNS4444444444XX"
         );
-        List<MaterialDto> ordersMaterial = new ArrayList<MaterialDto>();
-        suppliesMaterial.add(centralControlUnitDto);
-        customerPartnerDto.setOrdersProducts(ordersMaterial);
+        customerPartnerDto.addOrderedProduct(centralControlUnitDto);
         Partner customerPartnerEntity = modelMapper.map(customerPartnerDto, Partner.class);
         customerPartnerEntity = partnerService.create(customerPartnerEntity);
+        customerPartnerDto = modelMapper.map(customerPartnerEntity, PartnerDto.class);
 
         log.info(String.format("Created customerPartner: %s", customerPartnerEntity));
         log.info(String.format("Relationship Partner.ordersProducts has been persisted: %b",
@@ -131,13 +134,17 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
         centralControlUnitEntity = materialService.findByUuid(centralControlUnitEntity.getUuid());
         centralControlUnitDto = modelMapper.map(centralControlUnitEntity, MaterialDto.class);
 
-        List<PartnerDto> orderedByPartners = new ArrayList<PartnerDto>();
-        orderedByPartners.add(customerPartnerDto);
-        centralControlUnitDto.setOrderedByPartners(orderedByPartners);
+        centralControlUnitDto.addOrderedByPartner(customerPartnerDto);
         centralControlUnitEntity = modelMapper.map(centralControlUnitDto, Material.class);
         centralControlUnitEntity = materialService.update(centralControlUnitEntity);
 
+        //also update partner
+        customerPartnerEntity = modelMapper.map(customerPartnerDto, Partner.class);
+        customerPartnerEntity = partnerService.create(customerPartnerEntity);
+        customerPartnerDto = modelMapper.map(customerPartnerEntity, PartnerDto.class);
 
+
+        // Create Material Stock
         // get latest material due to relationships
         semiconductorEntity = materialService.findByUuid(semiconductorEntity.getUuid());
         semiconductorDto = modelMapper.map(createdSemiconductorEntity, MaterialDto.class);
@@ -152,12 +159,14 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
         materialStockEntity = materialStockService.create(materialStockEntity);
         log.info(String.format("Created materialStock: %s", materialStockEntity));
 
+
+        // Create Product Stock
         // get latest product due to relationships
         centralControlUnitEntity = materialService.findByUuid(centralControlUnitEntity.getUuid());
         centralControlUnitDto = modelMapper.map(centralControlUnitEntity, MaterialDto.class);
 
-        // get latest version as Dto
-        customerPartnerDto = modelMapper.map(customerPartnerDto, PartnerDto.class);
+        customerPartnerEntity = partnerService.findByUuid(customerPartnerEntity.getUuid());
+        customerPartnerDto = modelMapper.map(customerPartnerEntity, PartnerDto.class);
 
         ProductStockDto productStockDto = new ProductStockDto(
                 centralControlUnitDto,
@@ -166,10 +175,32 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
                 customerPartnerDto
         );
 
+        customerPartnerEntity = modelMapper.map(customerPartnerDto, Partner.class);
+        customerPartnerEntity = partnerService.update(customerPartnerEntity);
+
         ProductStock productStockEntity = modelMapper.map(productStockDto,
                 ProductStock.class);
         productStockEntity = productStockService.create(productStockEntity);
-        log.info(String.format("Created productStock: %s", productStockEntity));
+        log.info(String.format("Created productStock: %s", ((Stock) productStockEntity).toString()));
+
+
+        // Create PartnerProductStock
+        semiconductorEntity = materialService.findByUuid(semiconductorEntity.getUuid());
+        semiconductorDto = modelMapper.map(createdSemiconductorEntity, MaterialDto.class);
+
+        supplierPartnerEntity = partnerService.findByUuid(supplierPartnerEntity.getUuid());
+        supplierPartnerDto = modelMapper.map(supplierPartnerEntity, PartnerDto.class);
+
+        PartnerProductStockDto partnerProductStockDto = new PartnerProductStockDto(
+                semiconductorDto,
+                20,
+                supplierPartnerDto.getSiteBpns(),
+                supplierPartnerDto
+        );
+        PartnerProductStock partnerProductStockEntity = modelMapper.map(partnerProductStockDto,
+                PartnerProductStock.class);
+        partnerProductStockEntity = partnerProductStockService.create(partnerProductStockEntity);
+        log.info(String.format("Created partnerProductStock: %s", partnerProductStockEntity));
 
     }
 }

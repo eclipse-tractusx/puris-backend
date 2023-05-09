@@ -52,13 +52,24 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public Material findMaterialByMaterialNumberCustomer(String materialNumberCustomer) {
-        // TODO handle optional
-        return materialRepository.findByMaterialNumberCustomerAndMaterialFlagIsTrue(materialNumberCustomer).get();
+
+        Optional<Material> foundMaterial =
+                materialRepository.findByMaterialNumberCustomerAndMaterialFlagIsTrue(materialNumberCustomer);
+
+        if (!foundMaterial.isPresent()) {
+            return null;
+        }
+        return foundMaterial.get();
     }
 
     @Override
     public Material findProductByMaterialNumberCustomer(String materialNumberCustomer) {
-        // TODO handle optional
-        return materialRepository.findByMaterialNumberCustomerAndProductFlagIsTrue(materialNumberCustomer).get();
+        Optional<Material> foundProduct =
+                materialRepository.findByMaterialNumberCustomerAndProductFlagIsTrue(materialNumberCustomer);
+
+        if (!foundProduct.isPresent()) {
+            return null;
+        }
+        return foundProduct.get();
     }
 }

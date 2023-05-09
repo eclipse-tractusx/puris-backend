@@ -18,7 +18,6 @@ public class PartnerProductStockServiceImpl implements PartnerProductStockServic
 
     @Override
     public PartnerProductStock create(PartnerProductStock partnerProductStock) {
-        // TODO check if error handling is needed: Save PartnerProductStock
         return partnerProductStockRepository.save(partnerProductStock);
     }
 
@@ -40,6 +39,6 @@ public class PartnerProductStockServiceImpl implements PartnerProductStockServic
         if (existingStock.isPresent() && existingStock.get().getType() == DT_StockTypeEnum.PRODUCT) {
             return existingStock.get();
         } else
-            return null;//TODO check if error handling is needed: Updated PartnerProductStock is not material
+            return null;
     }
 }

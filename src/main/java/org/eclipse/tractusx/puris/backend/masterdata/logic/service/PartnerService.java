@@ -11,6 +11,8 @@ public interface PartnerService {
 
     Partner create(Partner partner);
 
+    Partner findByUuid(UUID partnerUuid);
+
     List<Partner> findAllCustomerPartnersForMaterialId(UUID materialUuid);
 
     Partner update(Partner partner);

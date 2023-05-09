@@ -25,8 +25,11 @@ public class ProductStockDto extends StockDto {
                            PartnerDto allocatedToCustomerPartner) {
         super(material, quantity, atSiteBpnl, new Date());
         this.setType(DT_StockTypeEnum.PRODUCT);
-        this.allocatedToCustomerPartner = allocatedToCustomerPartner;
+        setAllocatedToCustomerPartner(allocatedToCustomerPartner);
     }
 
-
+    public void setAllocatedToCustomerPartner(PartnerDto allocatedToCustomerPartner) {
+        this.allocatedToCustomerPartner = allocatedToCustomerPartner;
+        allocatedToCustomerPartner.getAllocatedProductStocksForCustomer().add(this);
+    }
 }

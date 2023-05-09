@@ -18,7 +18,6 @@ public class ProductStockServiceImpl implements ProductStockService {
 
     @Override
     public ProductStock create(ProductStock productStock) {
-        // TODO check if error handling is needed: Save ProductStock
         return productStockRepository.save(productStock);
     }
 
@@ -51,6 +50,6 @@ public class ProductStockServiceImpl implements ProductStockService {
         if (existingStock.isPresent() && existingStock.get().getType() == DT_StockTypeEnum.PRODUCT) {
             return existingStock.get();
         } else
-            return null;//TODO check if error handling is needed: Updated ProductStock is not material
+            return null;
     }
 }

@@ -18,7 +18,7 @@ import java.util.UUID;
 public abstract class StockDto implements Serializable {
 
     private UUID uuid;
-    // TODO: Check if material needs to be uuid or customerNumberMaterial instead
+
     private MaterialDto material;
 
     private double quantity;

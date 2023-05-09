@@ -1,6 +1,5 @@
 package org.eclipse.tractusx.puris.backend.stock.logic.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,6 @@ import java.util.Date;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class PartnerProductStockDto extends StockDto {
 
@@ -21,5 +19,13 @@ public class PartnerProductStockDto extends StockDto {
     public PartnerProductStockDto(MaterialDto material, double quantity, String atSiteBpnl) {
         super(material, quantity, atSiteBpnl, new Date());
         this.setType(DT_StockTypeEnum.PRODUCT);
+    }
+
+    public PartnerProductStockDto(MaterialDto material, double quantity, String atSiteBpnl,
+                                  PartnerDto supplierPartner) {
+        super(material, quantity, atSiteBpnl, new Date());
+        this.setType(DT_StockTypeEnum.PRODUCT);
+        this.supplierPartner = supplierPartner;
+        supplierPartner.addPartnerProductStock(this);
     }
 }

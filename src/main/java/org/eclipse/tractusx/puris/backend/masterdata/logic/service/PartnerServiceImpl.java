@@ -22,6 +22,16 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
+    public Partner findByUuid(UUID partnerUuid) {
+        Optional<Partner> foundPartner = partnerRepository.findById(partnerUuid);
+
+        if (!foundPartner.isPresent()) {
+            return null;
+        }
+        return foundPartner.get();
+    }
+
+    @Override
     public List<Partner> findAllCustomerPartnersForMaterialId(UUID materialUuid) {
         return partnerRepository.findAllByActsAsCustomerFlagIsTrueAndOrdersProducts_Uuid(materialUuid);
     }

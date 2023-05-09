@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -85,15 +86,12 @@ public class StockController {
         return allProductStocks;
     }
 
-    //TODO implement the Create or Update Product Stock call. Check for best practice of dto with relationship and how to handle Ids.
     @PostMapping("product-stocks")
     @ResponseBody
     public ProductStockDto createProductStocks(@RequestBody ProductStockDto productStockDto) {
 
-        // TODO validate mandatory attributes here or in Frontend or both
-
         ProductStock productStockToCreate = convertToEntity(productStockDto);
-        // TODO set last updated on to now according to ISO Timestamp
+        productStockToCreate.setLastUpdatedOn(new Date());
 
         ProductStock createdProductStock = productStockService.create(productStockToCreate);
 
@@ -105,17 +103,13 @@ public class StockController {
     @PutMapping("product-stocks")
     @ResponseBody
     public ProductStockDto updateProductStocks(@RequestBody ProductStockDto productStockDto) {
-
-        // TODO validate mandatory attributes here or in Frontend or both
-
-
         ProductStock existingProductStock = productStockService.findByUuid(productStockDto.getUuid());
         if (existingProductStock.getUuid() == null) {
             return null;
         }
 
         existingProductStock.setQuantity(productStockDto.getQuantity());
-        // TODO set last updated on to now according to ISO Timestamp
+        existingProductStock.setLastUpdatedOn(new Date());
 
         existingProductStock = productStockService.create(existingProductStock);
 
@@ -142,15 +136,12 @@ public class StockController {
         return allMaterialStocks;
     }
 
-    //TODO implement the Create or Update Material Stock call. Check for best practice of dto with relationship and how to handle Ids.
     @PostMapping("material-stocks")
     @ResponseBody
     public MaterialStockDto createMaterialStocks(@RequestBody MaterialStockDto materialStockDto) {
 
-        // TODO validate mandatory attributes here or in Frontend or both
-
         MaterialStock materialStockToCreate = convertToEntity(materialStockDto);
-        // TODO set last updated on to now according to ISO Timestamp
+        materialStockToCreate.setLastUpdatedOn(new Date());
 
         MaterialStock createdMterialStock = materialStockService.create(materialStockToCreate);
 
@@ -163,16 +154,13 @@ public class StockController {
     @ResponseBody
     public MaterialStockDto updateMaterialStocks(@RequestBody MaterialStockDto materialStockDto) {
 
-        // TODO validate mandatory attributes here or in Frontend or both
-
-
         MaterialStock existingMaterialStock = materialStockService.findByUuid(materialStockDto.getUuid());
         if (existingMaterialStock.getUuid() == null) {
             return null;
         }
 
         existingMaterialStock.setQuantity(materialStockDto.getQuantity());
-        // TODO set last updated on to now according to ISO Timestamp
+        existingMaterialStock.setLastUpdatedOn(new Date());
 
         existingMaterialStock = materialStockService.create(existingMaterialStock);
 
@@ -216,7 +204,5 @@ public class StockController {
     private PartnerDto convertToDto(Partner entity) {
         return modelMapper.map(entity, PartnerDto.class);
     }
-
-    // TODO implement trigger of Request Api for a set of partners supplying a given material. This also creates and updates PartnerProductStock
 
 }

@@ -20,12 +20,10 @@
  */
 package org.eclipse.tractusx.puris.backend.common.api.logic.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_RequestStateEnum;
 
 /**
  * Dto for {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.Request}
@@ -34,25 +32,6 @@ import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_Re
 @Setter
 @ToString
 @NoArgsConstructor
-public class RequestDto extends MessageDto {
+public class ResponseDto extends MessageDto {
 
-    /**
-     * State of the request.
-     *
-     * @see DT_RequestStateEnum
-     */
-    @NotNull
-    private DT_RequestStateEnum state;
-
-    /**
-     * Create a RequestDto from message
-     *
-     * @param state   state to set
-     * @param message message to set
-     */
-    public RequestDto(DT_RequestStateEnum state, MessageDto message) {
-        this.state = state;
-        this.setPayload(message.getPayload());
-        this.setHeader(message.getHeader());
-    }
 }

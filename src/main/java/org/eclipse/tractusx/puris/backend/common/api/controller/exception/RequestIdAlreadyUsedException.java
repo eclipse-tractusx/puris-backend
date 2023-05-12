@@ -18,23 +18,27 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.logic.service;
+package org.eclipse.tractusx.puris.backend.common.api.controller.exception;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Message;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.UUID;
 
 /**
- * Service receives performs the tasks associated with the Response API.
+ * Exception for
+ * {@link org.eclipse.tractusx.puris.backend.common.api.controller.RequestApiController}, if
+ * there is already a request with given id set in header.
  */
-public interface ResponseApiService {
+@ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY, reason = "Request ID has already been used.")
+public class RequestIdAlreadyUsedException extends RuntimeException {
 
     /**
-     * Consume the response
-     * <p>
-     * Commonly this involves:
-     * <li>validate the data</li>
-     * <li>store the data</li>
+     * Create AlreadyInUse exception with exception message for specific request
      *
-     * @param message to consume
+     * @param requestUuid requestUuid to set in message
      */
-    public void consumeResponse(Message message);
+    public RequestIdAlreadyUsedException(UUID requestUuid) {
+        super(String.format("Request ID %s has already been used.", requestUuid));
+    }
 }

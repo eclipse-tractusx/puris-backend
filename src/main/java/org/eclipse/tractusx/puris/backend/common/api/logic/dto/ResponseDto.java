@@ -18,23 +18,20 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.repository;
+package org.eclipse.tractusx.puris.backend.common.api.logic.dto;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
- * Repository to access Responses
+ * Dto for {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.Request}
  */
-public interface ResponseRepository extends JpaRepository<Request, UUID> {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class ResponseDto extends MessageDto {
 
-    /**
-     * find the request by the requestUuuid from the message's header
-     *
-     * @param headerRequestUuid uuid set by the sending partner in the header
-     * @return Request
-     */
-    public Request findResponseByHeader_RequestId(UUID headerRequestUuid);
 }

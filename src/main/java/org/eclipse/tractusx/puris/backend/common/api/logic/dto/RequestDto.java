@@ -18,23 +18,41 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.repository;
+package org.eclipse.tractusx.puris.backend.common.api.logic.dto;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_RequestStateEnum;
 
 /**
- * Repository to access Responses
+ * Dto for {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.Request}
  */
-public interface ResponseRepository extends JpaRepository<Request, UUID> {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public class RequestDto extends MessageDto {
 
     /**
-     * find the request by the requestUuuid from the message's header
+     * State of the request.
      *
-     * @param headerRequestUuid uuid set by the sending partner in the header
-     * @return Request
+     * @see DT_RequestStateEnum
      */
-    public Request findResponseByHeader_RequestId(UUID headerRequestUuid);
+    @NotNull
+    private DT_RequestStateEnum state;
+
+    /**
+     * Create a RequestDto from message
+     *
+     * @param state   state to set
+     * @param message message to set
+     */
+    public RequestDto(DT_RequestStateEnum state, MessageDto message) {
+        this.state = state;
+        this.setPayload(message.getPayload());
+        this.setHeader(message.getHeader());
+    }
 }

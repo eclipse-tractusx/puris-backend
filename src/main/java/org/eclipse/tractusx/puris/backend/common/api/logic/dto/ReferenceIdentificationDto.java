@@ -18,23 +18,32 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.repository;
+package org.eclipse.tractusx.puris.backend.common.api.logic.dto;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.UUID;
 
 /**
- * Repository to access Responses
+ * Dto for
+ * {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.ReferenceIdentification}
  */
-public interface ResponseRepository extends JpaRepository<Request, UUID> {
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+public abstract class ReferenceIdentificationDto {
 
     /**
-     * find the request by the requestUuuid from the message's header
-     *
-     * @param headerRequestUuid uuid set by the sending partner in the header
-     * @return Request
+     * Technical identifier for a Reference Identification.
+     * <p>
+     * Only set for existing entities.
      */
-    public Request findResponseByHeader_RequestId(UUID headerRequestUuid);
+    private UUID uuid;
+
+    abstract String getLeadingReference();
+
 }

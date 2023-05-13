@@ -31,10 +31,10 @@ import java.util.UUID;
 public interface RequestRepository extends JpaRepository<Request, UUID> {
 
     /**
-     * find the request by the requestUuuid from the message's header
+     * find the request by the requestUuid from the message's header
      *
      * @param headerRequestUuid uuid set by the sending partner in the header
      * @return Request
      */
-    public Request findRequestByPayload_Header_RequestId(UUID headerRequestUuid);
+    public Request findRequestByHeader_RequestId(UUID headerRequestUuid);
 }

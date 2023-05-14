@@ -19,25 +19,27 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.masterdata.domain.repository;
+package org.eclipse.tractusx.puris.backend.stock.logic.service;
 
-import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Message;
+import org.eclipse.tractusx.puris.backend.common.api.logic.service.ResponseApiService;
+import org.hibernate.cfg.NotYetImplementedException;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+/**
+ * Service implements the handling of a response for Product Stock
+ * <p>
+ * That means that one need to save
+ * {@link org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock} according to the
+ * API specification.
+ */
+@Component
+public class ProductStockResponseApiServiceImpl implements ResponseApiService {
 
-public interface PartnerRepository extends JpaRepository<Partner, UUID> {
-
-    List<Partner> findAllByActsAsCustomerFlagIsTrue();
-
-    List<Partner> findAllByActsAsCustomerFlagIsTrueAndOrdersProducts_Uuid(UUID materialUuid);
-
-    List<Partner> findAllByActsAsSupplierFlagIsTrue();
-
-    Optional<Partner> findFirstByBpnl(String bpnl);
-
-    Optional<Partner> findFirstBySiteBpns(String siteBpns);
+    @Override
+    public void consumeResponse(Message message) {
+        throw new NotYetImplementedException("Implement Request Flow for " +
+                "ProductStockRequestApiService");
+    }
 
 }

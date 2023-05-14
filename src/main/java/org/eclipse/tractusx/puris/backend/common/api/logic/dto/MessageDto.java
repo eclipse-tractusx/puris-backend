@@ -18,37 +18,52 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.model;
+package org.eclipse.tractusx.puris.backend.common.api.logic.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_RequestStateEnum;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Response;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
- * This Request represents the message received via a Request API.
- * <p>
- * This Request may not be confused with an HTTP request.
- * Both, the Response and the Request, are called (api) request.
+ * Dto for {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.Message}
  */
-@Entity
-@Table(name = "Request")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class Request extends Message {
+public class MessageDto {
 
     /**
-     * State of the request.
-     *
-     * @see DT_RequestStateEnum
+     * Technical identifier for a {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.Message}.
+     * <p>
+     * Only set for existing entities.
+     */
+    @JsonIgnore
+    private UUID uuid;
+
+    /**
+     * Steering information of a {@link Request} or {@link Response} api message.
      */
     @NotNull
-    private DT_RequestStateEnum state;
+    @JsonProperty("headers")
+    private MessageHeaderDto header;
 
+    /**
+     * List of actual content of the payload.
+     * <p>
+     * May contain also errors.
+     */
+    @NotNull
+    @JsonProperty("payload")
+    private List<MessageContentDto> payload = new ArrayList<>();
 }

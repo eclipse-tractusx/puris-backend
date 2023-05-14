@@ -18,23 +18,23 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.repository;
+package org.eclipse.tractusx.puris.backend.common.api.logic.service;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.UUID;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Message;
 
 /**
- * Repository to access Responses
+ * Service receives performs the tasks associated with the Response API.
  */
-public interface ResponseRepository extends JpaRepository<Request, UUID> {
+public interface ResponseApiService {
 
     /**
-     * find the request by the requestUuuid from the message's header
+     * Consume the response
+     * <p>
+     * Commonly this involves:
+     * <li>validate the data</li>
+     * <li>store the data</li>
      *
-     * @param headerRequestUuid uuid set by the sending partner in the header
-     * @return Request
+     * @param message to consume
      */
-    public Request findResponseByHeader_RequestId(UUID headerRequestUuid);
+    public void consumeResponse(Message message);
 }

@@ -21,6 +21,7 @@
  */
 package org.eclipse.tractusx.puris.backend;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Material;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
@@ -32,6 +33,7 @@ import org.eclipse.tractusx.puris.backend.stock.domain.model.MaterialStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.PartnerProductStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.Stock;
+import org.eclipse.tractusx.puris.backend.stock.logic.adapter.ProductStockSammMapper;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.MaterialStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.PartnerProductStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockDto;
@@ -39,8 +41,6 @@ import org.eclipse.tractusx.puris.backend.stock.logic.service.MaterialStockServi
 import org.eclipse.tractusx.puris.backend.stock.logic.service.PartnerProductStockService;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.ProductStockService;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -53,6 +53,7 @@ public class DataInjectionCommandLineRunner implements CommandLineRunner {
 
     @Autowired
     private ModelMapper modelMapper;
+
 
     @Autowired
     private MaterialService materialService;
@@ -68,6 +69,15 @@ public class DataInjectionCommandLineRunner implements CommandLineRunner {
 
     @Autowired
     private PartnerProductStockService partnerProductStockService;
+
+    @Autowired
+    private ProductStockSammMapper productStockSammMapper;
+
+    private ObjectMapper objectMapper;
+
+    public DataInjectionCommandLineRunner(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -221,5 +231,10 @@ public class DataInjectionCommandLineRunner implements CommandLineRunner {
                 PartnerProductStock.class);
         partnerProductStockEntity = partnerProductStockService.create(partnerProductStockEntity);
         log.info(String.format("Created partnerProductStock: %s", partnerProductStockEntity));
+
+        productStockDto = modelMapper.map(productStockEntity, ProductStockDto.class);
+        org.eclipse.tractusx.puris.backend.stock.logic.dto.samm.ProductStock productStockSamm = productStockSammMapper.toSamm(productStockDto);
+
+        log.info(objectMapper.writeValueAsString(productStockSamm));
     }
 }

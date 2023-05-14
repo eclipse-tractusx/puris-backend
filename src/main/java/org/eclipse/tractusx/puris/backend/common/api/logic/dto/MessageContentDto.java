@@ -18,27 +18,38 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.model;
+package org.eclipse.tractusx.puris.backend.common.api.logic.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockSammDto;
+
+import java.util.UUID;
+
+import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.DEDUCTION;
 
 /**
- * This Response represents the message received via a Response API.
- * <p>
- * This Response may not be confused with an HTTP response.
- * Both, the Response and the Request, are called (api) request.
+ * Dto for {@link org.eclipse.tractusx.puris.backend.common.api.domain.model.MessageContent}.
  */
-@Entity
-@Table(name = "Response")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-public class Response extends Message {
+@JsonTypeInfo(use = DEDUCTION) // Intended usage
+@JsonSubTypes({@JsonSubTypes.Type(MessageContentErrorDto.class),
+        @JsonSubTypes.Type(ProductStockSammDto.class)})
+public abstract class MessageContentDto {
 
+    /**
+     * Technical identifier for a Message Content.
+     * <p>
+     * Only set for existing entities.
+     */
+    @JsonIgnore
+    private UUID uuid;
 }

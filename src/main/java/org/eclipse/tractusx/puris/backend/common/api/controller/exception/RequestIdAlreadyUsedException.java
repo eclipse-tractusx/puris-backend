@@ -18,23 +18,27 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.repository;
+package org.eclipse.tractusx.puris.backend.common.api.controller.exception;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
 /**
- * Repository to access Responses
+ * Exception for
+ * {@link org.eclipse.tractusx.puris.backend.common.api.controller.RequestApiController}, if
+ * there is already a request with given id set in header.
  */
-public interface ResponseRepository extends JpaRepository<Request, UUID> {
+@ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY, reason = "Request ID has already been used.")
+public class RequestIdAlreadyUsedException extends RuntimeException {
 
     /**
-     * find the request by the requestUuuid from the message's header
+     * Create AlreadyInUse exception with exception message for specific request
      *
-     * @param headerRequestUuid uuid set by the sending partner in the header
-     * @return Request
+     * @param requestUuid requestUuid to set in message
      */
-    public Request findResponseByHeader_RequestId(UUID headerRequestUuid);
+    public RequestIdAlreadyUsedException(UUID requestUuid) {
+        super(String.format("Request ID %s has already been used.", requestUuid));
+    }
 }

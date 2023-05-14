@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2023 Volkswagen AG
- * Copyright (c) 2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
+ * Copyright (c) 2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V.
+ * (represented by Fraunhofer ISST)
  * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
@@ -18,23 +19,19 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.common.api.domain.repository;
+package org.eclipse.tractusx.puris.backend.stock.logic.dto;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
-import org.springframework.data.jpa.repository.JpaRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.MessageContentDto;
 
-import java.util.UUID;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProductStockSammDto extends MessageContentDto {
 
-/**
- * Repository to access Responses
- */
-public interface ResponseRepository extends JpaRepository<Request, UUID> {
-
-    /**
-     * find the request by the requestUuuid from the message's header
-     *
-     * @param headerRequestUuid uuid set by the sending partner in the header
-     * @return Request
-     */
-    public Request findResponseByHeader_RequestId(UUID headerRequestUuid);
+    private String name;
 }

@@ -19,28 +19,27 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.stock.controller;
+package org.eclipse.tractusx.puris.backend.stock.logic.service;
 
-import org.eclipse.tractusx.puris.backend.common.api.controller.ResponseApiController;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Message;
 import org.eclipse.tractusx.puris.backend.common.api.logic.service.ResponseApiService;
-import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockResponseDto;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.hibernate.cfg.NotYetImplementedException;
+import org.springframework.stereotype.Component;
 
-@RestController
-@RequestMapping("product-stock")
-public class ProductStockResponseApiController extends ResponseApiController {
+/**
+ * Service implements the handling of a response for Product Stock
+ * <p>
+ * That means that one need to save
+ * {@link org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock} according to the
+ * API specification.
+ */
+@Component
+public class ProductStockResponseApiServiceImpl implements ResponseApiService {
 
-    public ProductStockResponseApiController(ResponseApiService responseApiService) {
-        super(responseApiService);
-    }
-
-    @PostMapping("request")
-    public ResponseEntity postResponse(@RequestBody ProductStockResponseDto productStockResponseDto) {
-        return super.postResponse(productStockResponseDto);
+    @Override
+    public void consumeResponse(Message message) {
+        throw new NotYetImplementedException("Implement Request Flow for " +
+                "ProductStockRequestApiService");
     }
 
 }

@@ -21,6 +21,7 @@
  */
 package org.eclipse.tractusx.puris.backend;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Material;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
 import org.eclipse.tractusx.puris.backend.masterdata.logic.dto.MaterialDto;
@@ -31,6 +32,7 @@ import org.eclipse.tractusx.puris.backend.stock.domain.model.MaterialStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.PartnerProductStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.ProductStock;
 import org.eclipse.tractusx.puris.backend.stock.domain.model.Stock;
+import org.eclipse.tractusx.puris.backend.stock.logic.adapter.ProductStockSammMapper;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.MaterialStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.PartnerProductStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockDto;
@@ -67,6 +69,15 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
 
     @Autowired
     private PartnerProductStockService partnerProductStockService;
+
+    @Autowired
+    private ProductStockSammMapper productStockSammMapper;
+
+    private ObjectMapper objectMapper;
+
+    public CustomerCommandLineRunner(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     private static final Logger log = LoggerFactory.getLogger(PurisApplication.class);
 
@@ -223,5 +234,9 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
         partnerProductStockEntity = partnerProductStockService.create(partnerProductStockEntity);
         log.info(String.format("Created partnerProductStock: %s", partnerProductStockEntity));
 
+        productStockDto = modelMapper.map(productStockEntity, ProductStockDto.class);
+        org.eclipse.tractusx.puris.backend.stock.logic.dto.samm.ProductStock productStockSamm = productStockSammMapper.toSamm(productStockDto);
+
+        log.info(objectMapper.writeValueAsString(productStockSamm));
     }
 }

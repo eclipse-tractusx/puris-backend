@@ -1,7 +1,6 @@
 /*
  * Copyright (c) 2023 Volkswagen AG
- * Copyright (c) 2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V.
- * (represented by Fraunhofer ISST)
+ * Copyright (c) 2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
  * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
@@ -19,27 +18,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.masterdata.logic.service;
+package org.eclipse.tractusx.puris.backend.stock.logic;
 
-import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
-
-@Service
-public interface PartnerService {
-
-    Partner create(Partner partner);
-
-    Partner findByUuid(UUID partnerUuid);
-
-    List<Partner> findAllCustomerPartnersForMaterialId(UUID materialUuid);
-
-    Partner update(Partner partner);
-
-    Partner findByBpnl(String bpnl);
-
-    Partner findByBpns(String bpns);
-
+public class ProductStockResponseMessageContentDto {
 }

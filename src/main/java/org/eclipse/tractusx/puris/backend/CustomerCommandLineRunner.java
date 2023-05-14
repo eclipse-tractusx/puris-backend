@@ -36,6 +36,7 @@ import org.eclipse.tractusx.puris.backend.stock.logic.adapter.ProductStockSammMa
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.MaterialStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.PartnerProductStockDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockDto;
+import org.eclipse.tractusx.puris.backend.stock.logic.dto.samm.ProductStockSammDto;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.MaterialStockService;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.PartnerProductStockService;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.ProductStockService;
@@ -235,8 +236,8 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
         log.info(String.format("Created partnerProductStock: %s", partnerProductStockEntity));
 
         productStockDto = modelMapper.map(productStockEntity, ProductStockDto.class);
-        org.eclipse.tractusx.puris.backend.stock.logic.dto.samm.ProductStock productStockSamm = productStockSammMapper.toSamm(productStockDto);
+        ProductStockSammDto productStockSammDto = productStockSammMapper.toSamm(productStockDto);
 
-        log.info(objectMapper.writeValueAsString(productStockSamm));
+        log.info(objectMapper.writeValueAsString(productStockSammDto));
     }
 }

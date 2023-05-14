@@ -19,25 +19,23 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.masterdata.domain.repository;
+package org.eclipse.tractusx.puris.backend.stock.controller;
 
-import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.eclipse.tractusx.puris.backend.common.api.controller.ResponseApiController;
+import org.eclipse.tractusx.puris.backend.stock.logic.dto.ProductStockResponseDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+@RestController
+@RequestMapping("product-stock")
+public class ProductStockResponseApiController extends ResponseApiController {
 
-public interface PartnerRepository extends JpaRepository<Partner, UUID> {
-
-    List<Partner> findAllByActsAsCustomerFlagIsTrue();
-
-    List<Partner> findAllByActsAsCustomerFlagIsTrueAndOrdersProducts_Uuid(UUID materialUuid);
-
-    List<Partner> findAllByActsAsSupplierFlagIsTrue();
-
-    Optional<Partner> findFirstByBpnl(String bpnl);
-
-    Optional<Partner> findFirstBySiteBpns(String siteBpns);
+    @PostMapping("request")
+    public ResponseEntity postResponse(@RequestBody ProductStockResponseDto productStockResponseDto) {
+        return super.postResponse(productStockResponseDto);
+    }
 
 }

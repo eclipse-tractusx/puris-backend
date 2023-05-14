@@ -22,6 +22,14 @@
 package org.eclipse.tractusx.puris.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_RequestStateEnum;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_UseCaseEnum;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.MessageContentDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.MessageContentErrorDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.MessageHeaderDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.RequestDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.service.RequestService;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Material;
 import org.eclipse.tractusx.puris.backend.masterdata.domain.model.Partner;
 import org.eclipse.tractusx.puris.backend.masterdata.logic.dto.MaterialDto;
@@ -47,7 +55,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class CustomerCommandLineRunner implements CommandLineRunner {
@@ -73,6 +84,9 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
 
     @Autowired
     private ProductStockSammMapper productStockSammMapper;
+
+    @Autowired
+    private RequestService requestService;
 
     private ObjectMapper objectMapper;
 
@@ -239,5 +253,33 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
         ProductStockSammDto productStockSammDto = productStockSammMapper.toSamm(productStockDto);
 
         log.info(objectMapper.writeValueAsString(productStockSammDto));
+
+        MessageHeaderDto messageHeaderDto = new MessageHeaderDto();
+        messageHeaderDto.setRequestId(UUID.fromString("4979893e-dd6b-43db-b732-6e48b4ba35b3"));
+        messageHeaderDto.setRespondAssetId("product-stock-response-api");
+        messageHeaderDto.setContractAgreementId("some cid");
+        messageHeaderDto.setSender("BPNL1234567890ZZ");
+        messageHeaderDto.setSenderEdc("http://sender-edc.de");
+        messageHeaderDto.setReceiver("http://your-edc.de");
+        messageHeaderDto.setUseCase(DT_UseCaseEnum.PURIS);
+        messageHeaderDto.setCreationDate(new Date());
+
+        log.info(objectMapper.writeValueAsString(messageHeaderDto));
+
+        List<MessageContentDto> messageContentDtos = new ArrayList<>();
+
+        MessageContentDto messageContentDto = new MessageContentErrorDto();
+        messageContentDtos.add(messageContentDto);
+
+        RequestDto requestDto = new RequestDto(
+                DT_RequestStateEnum.RECEIPT,
+                messageHeaderDto,
+                messageContentDtos
+        );
+
+        Request createdRequest = requestService.createRequest(modelMapper.map(requestDto,
+                Request.class));
+        log.info(String.format("Created Request: %s", createdRequest));
+
     }
 }

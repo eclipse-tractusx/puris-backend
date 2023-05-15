@@ -196,7 +196,7 @@ public class EdcAdapterService {
                 .port(dataPort)
                 .addPathSegment("data")
                 .addPathSegment("catalog")
-                .addEncodedQueryParameter("providerUrl", idsUrl);
+                .addEncodedQueryParameter("providerUrl", idsUrl + "/data");
 
         HttpUrl httpUrl = urlBuilder.build();
 

@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2022,2023 Volkswagen AG
- * Copyright (c) 2022,2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
- * Copyright (c) 2022,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Volkswagen AG
+ * Copyright (c) 2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,31 +18,19 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.model;
-
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import jakarta.persistence.Entity;
+package org.eclipse.tractusx.puris.backend.common.edc.logic.dto.datatype;
 
 /**
- * External Connector object, will be used for dropdown selection in frontend.
+ * Type for asset.dataAddress.type of EDC Asset
  */
-@Entity
-@Getter
-@Setter
-@NoArgsConstructor
-public class ExternalConnector extends JpaBaseEntity {
+public enum DT_DataAddressTypeEnum {
+    /**
+     * When providing data for proxy, use HttpData
+     */
+    HttpData,
 
     /**
-     * Display name of the connector.
+     * When initializing transfer for proxy, use HttpProxy
      */
-    private String name;
-
-    /**
-     * URL of the connector.
-     */
-    private String url;
-
+    HttpProxy
 }

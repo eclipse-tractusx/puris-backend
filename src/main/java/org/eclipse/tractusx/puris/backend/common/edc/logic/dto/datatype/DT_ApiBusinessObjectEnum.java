@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2022,2023 Volkswagen AG
- * Copyright (c) 2022,2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
- * Copyright (c) 2022,2023 Contributors to the Eclipse Foundation
+ * Copyright (c) 2023 Volkswagen AG
+ * Copyright (c) 2023 Fraunhofer-Gesellschaft zur Foerderung der angewandten Forschung e.V. (represented by Fraunhofer ISST)
+ * Copyright (c) 2023 Contributors to the Eclipse Foundation
  *
  * See the NOTICE file(s) distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,15 +18,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.model.repo;
-
-import org.eclipse.tractusx.puris.backend.model.ExternalConnector;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+package org.eclipse.tractusx.puris.backend.common.edc.logic.dto.datatype;
 
 /**
- * JPA Repository for {@link ExternalConnector} entities.
+ * Type for asset.property.apibusinessobject of an EDC Asset
  */
-@Repository
-public interface ExternalConnectorRepository extends JpaRepository<ExternalConnector, Long> {
+public enum DT_ApiBusinessObjectEnum {
+    /**
+     * Business object is a product stock
+     */
+    productStock
 }

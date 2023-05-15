@@ -18,25 +18,32 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.eclipse.tractusx.puris.backend.service;
+package org.eclipse.tractusx.puris.backend.common.edc.logic.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.*;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.puris.backend.common.edc.logic.dto.CreateAssetDto;
+import org.eclipse.tractusx.puris.backend.common.edc.logic.util.EDCRequestBodyBuilder;
 import org.eclipse.tractusx.puris.backend.model.repo.OrderRepository;
-import org.eclipse.tractusx.puris.backend.util.EDCRequestBodyBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service Layer of EDC Adapter. Builds and sends requests to a productEDC.
  * The EDC connection is configured using the application.properties file.
  */
 @Service
-public class EdcAdapter {
+@Slf4j
+public class EdcAdapterService {
     private static final OkHttpClient CLIENT = new OkHttpClient();
 
     @Autowired
@@ -60,6 +67,18 @@ public class EdcAdapter {
     @Value("${minikube.ip}")
     private String minikubeIp;
 
+    @Value("${request.serverendpoint}")
+    private String requestServerEndpointURL;
+
+    @Value("${response.serverendpoint}")
+    private String responseServerEndpointURL;
+
+    private ObjectMapper objectMapper;
+
+    public EdcAdapterService(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     /**
      * Publish an order at own EDC.
      *
@@ -81,6 +100,56 @@ public class EdcAdapter {
         }
         return false;
     }
+
+    public boolean publishRequestAndResponseAssetAtEDC(String serverOwnerId) throws IOException {
+
+        String[] assetIds = {"asset.properties.asset:request-api." + serverOwnerId,
+                "asset.properties.asset:response-api." + serverOwnerId};
+        String[] serverURLs = {requestServerEndpointURL, responseServerEndpointURL};
+        boolean success = true;
+        for (int i = 0; i < 2; i++) {
+            String assetId = assetIds[i];
+            String endpointURL = serverURLs[i];
+            var assetBody = EDCRequestBodyBuilder.buildAssetRequestBody(endpointURL, assetId);
+            var policyBody = EDCRequestBodyBuilder.buildPolicyRequestBody(assetId);
+            var contractBody = EDCRequestBodyBuilder.buildContractRequestBody(assetId);
+            success = success && sendEdcRequest(assetBody, "/data/assets").isSuccessful();
+            success = success && sendEdcRequest(policyBody, "/data/policydefinitions").isSuccessful();
+            success = success && sendEdcRequest(contractBody, "/data/contractdefinitions").isSuccessful();
+            log.info(endpointURL);
+        }
+        return success;
+    }
+
+    /**
+     * Publish an Asset (ContractDefinition) using an {@link CreateAssetDto} with a public policy.
+     *
+     * @param createAssetDto asset creation dto to use.
+     * @return true, if ContractDefinition has been created successfully
+     * @throws IOException   if REST calls for creation could not be sent
+     * @throws JSONException if createAssetDto could not be parsed into JsonNode
+     */
+    public boolean publishAssetAtEDC(CreateAssetDto createAssetDto) throws IOException,
+            JSONException {
+
+        String assetId = createAssetDto.getAssetDto().getPropertiesDto().getId();
+
+        boolean success = true;
+        JsonNode assetBody = objectMapper.valueToTree(createAssetDto);
+        JsonNode policyBody =
+                EDCRequestBodyBuilder.buildPolicyRequestBody(assetId);
+        JsonNode contractBody = EDCRequestBodyBuilder.buildContractRequestBody(assetId);
+        success = success && sendEdcRequest(assetBody, "/data/assets").isSuccessful();
+        log.info(String.format("Creation of asset was successfull: %b", success));
+        success = success && sendEdcRequest(policyBody, "/data/policydefinitions").isSuccessful();
+        log.info(String.format("Creation of policy was successfull: %b", success));
+        success = success && sendEdcRequest(contractBody, "/data/contractdefinitions").isSuccessful();
+        log.info(String.format("Created Contract Definition (%b) for Asset %s", success,
+                objectMapper.writeValueAsString(createAssetDto)));
+
+        return success;
+    }
+
 
     /**
      * Get catalog from an EDC.
@@ -112,6 +181,50 @@ public class EdcAdapter {
     }
 
     /**
+     * Get catalog from an EDC.
+     *
+     * @param idsUrl           url of the EDC to get catalog from.
+     * @param filterProperties maps with key = asset property and value = filter value
+     * @return catalog of the requested EDC.
+     * @throws IOException if the connection to the EDC failed.
+     */
+    public String getCatalog(String idsUrl, Optional<Map<String, String>> filterProperties) throws IOException {
+
+        HttpUrl.Builder urlBuilder = new HttpUrl.Builder();
+        urlBuilder.scheme("http")
+                .host(edcHost)
+                .port(dataPort)
+                .addPathSegment("data")
+                .addPathSegment("catalog")
+                .addEncodedQueryParameter("providerUrl", idsUrl);
+
+        HttpUrl httpUrl = urlBuilder.build();
+
+        // workaround EDC 0.3 takes filter=key=value, but HttpUrlBuilder encodes = to %3D
+        // which is not recognized
+        if (filterProperties.isPresent() && filterProperties.get().size() >= 1) {
+            String url = urlBuilder.build().toString();
+
+            for (Map.Entry<String, String> entry : filterProperties.get().entrySet()) {
+                url = url + String.format("&filter=%s=%s", entry.getKey(), entry.getValue());
+            }
+            httpUrl = HttpUrl.parse(url);
+        }
+
+        var request = new Request.Builder()
+                .get()
+                .url(httpUrl)
+                .header("X-Api-Key", edcApiKey)
+                .header("Content-Type", "application/json")
+                .build();
+        var response = CLIENT.newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new IOException(response.body().string());
+        }
+        return response.body().string();
+    }
+
+    /**
      * Get received data from a transfer from edc backend application.
      *
      * @param transferId id of the transfer.
@@ -132,7 +245,7 @@ public class EdcAdapter {
      * Start a negotitation with another EDC.
      *
      * @param connectorAddress ids url of the negotiation counterparty.
-     * @param orderId id of the negotiations target asset.
+     * @param orderId          id of the negotiations target asset.
      * @return response body received from the EDC.
      * @throws IOException if the connection to the EDC failed.
      */
@@ -145,10 +258,10 @@ public class EdcAdapter {
     /**
      * Start a data transfer with another EDC.
      *
-     * @param transferId id created for the transferprocess.
+     * @param transferId       id created for the transferprocess.
      * @param connectorAddress ids url of the transfer counterparty.
-     * @param contractId id of the negotiated contract.
-     * @param orderId id of the transfers target asset.
+     * @param contractId       id of the negotiated contract.
+     * @param orderId          id of the transfers target asset.
      * @return response body received from the EDC.
      * @throws IOException if the connection to the EDC failed.
      */
@@ -190,7 +303,7 @@ public class EdcAdapter {
     /**
      * Send a GET request to the own EDC.
      *
-     * @param resourceId (optional) id of the resource to request, will be left empty if null.
+     * @param resourceId   (optional) id of the resource to request, will be left empty if null.
      * @param pathSegments varargs for the path segments of the request
      *                     (e.g "data", "assets" will be turned to /data/assets).
      * @return response body received from the EDC.
@@ -201,10 +314,10 @@ public class EdcAdapter {
                 .scheme("http")
                 .host(edcHost)
                 .port(dataPort);
-        for(var seg : pathSegments) {
+        for (var seg : pathSegments) {
             urlBuilder.addPathSegment(seg);
         }
-        if(resourceId != null) {
+        if (resourceId != null) {
             urlBuilder.addPathSegment(resourceId);
         }
         var url = urlBuilder.build();
@@ -222,17 +335,19 @@ public class EdcAdapter {
      * Util method for building a http POST request to the own EDC.
      *
      * @param requestBody requestBody to be sent to the EDC.
-     * @param urlSuffix path to POST data to
+     * @param urlSuffix   path to POST data to
      * @return response received from the EDC.
      * @throws IOException if the connection to the EDC failed.
      */
     private Response sendEdcRequest(JsonNode requestBody, String urlSuffix) throws IOException {
-        var request = new Request.Builder()
+        Request request = new Request.Builder()
                 .header("X-Api-Key", edcApiKey)
                 .header("Content-Type", "application/json")
                 .post(RequestBody.create(MediaType.parse("application/json"), requestBody.toString()))
                 .url("http://" + edcHost + ":" + dataPort + urlSuffix)
                 .build();
+
+        log.info(String.format("Request body of EDC Request: %s", requestBody));
         return CLIENT.newCall(request).execute();
     }
 

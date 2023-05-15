@@ -22,6 +22,7 @@
 package org.eclipse.tractusx.puris.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
 import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_RequestStateEnum;
 import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_UseCaseEnum;
@@ -49,8 +50,6 @@ import org.eclipse.tractusx.puris.backend.stock.logic.service.MaterialStockServi
 import org.eclipse.tractusx.puris.backend.stock.logic.service.PartnerProductStockService;
 import org.eclipse.tractusx.puris.backend.stock.logic.service.ProductStockService;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -61,7 +60,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class CustomerCommandLineRunner implements CommandLineRunner {
+@Slf4j
+public class DataInjectionCommandLineRunner implements CommandLineRunner {
 
     @Autowired
     private ModelMapper modelMapper;
@@ -90,11 +90,9 @@ public class CustomerCommandLineRunner implements CommandLineRunner {
 
     private ObjectMapper objectMapper;
 
-    public CustomerCommandLineRunner(ObjectMapper objectMapper) {
+    public DataInjectionCommandLineRunner(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
-    private static final Logger log = LoggerFactory.getLogger(PurisApplication.class);
 
     @Override
     public void run(String... args) throws Exception {

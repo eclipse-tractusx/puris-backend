@@ -21,10 +21,25 @@
  */
 package org.eclipse.tractusx.puris.backend.stock.logic.service;
 
-import org.eclipse.tractusx.puris.backend.common.api.domain.model.Message;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.puris.backend.common.api.controller.exception.RequestIdNotFoundException;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.Request;
+import org.eclipse.tractusx.puris.backend.common.api.domain.model.datatype.DT_RequestStateEnum;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.MessageContentDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.MessageContentErrorDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.dto.ResponseDto;
+import org.eclipse.tractusx.puris.backend.common.api.logic.service.RequestService;
 import org.eclipse.tractusx.puris.backend.common.api.logic.service.ResponseApiService;
-import org.hibernate.cfg.NotYetImplementedException;
+import org.eclipse.tractusx.puris.backend.stock.domain.model.PartnerProductStock;
+import org.eclipse.tractusx.puris.backend.stock.logic.adapter.ProductStockSammMapper;
+import org.eclipse.tractusx.puris.backend.stock.logic.dto.PartnerProductStockDto;
+import org.eclipse.tractusx.puris.backend.stock.logic.dto.samm.ProductStockSammDto;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Service implements the handling of a response for Product Stock
@@ -34,12 +49,88 @@ import org.springframework.stereotype.Component;
  * API specification.
  */
 @Component
+@Slf4j
 public class ProductStockResponseApiServiceImpl implements ResponseApiService {
 
+    @Autowired
+    private RequestService requestService;
+
+    @Autowired
+    private PartnerProductStockService partnerProductStockService;
+
+    @Autowired
+    private ProductStockSammMapper productStockSammMapper;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
     @Override
-    public void consumeResponse(Message message) {
-        throw new NotYetImplementedException("Implement Request Flow for " +
-                "ProductStockRequestApiService");
+    public void consumeResponse(ResponseDto responseDto) {
+
+        Request correspondingRequest = findCorrespondingRequest(responseDto);
+
+        for (MessageContentDto messageContentDto : responseDto.getPayload()) {
+
+            if (messageContentDto instanceof ProductStockSammDto) {
+
+                ProductStockSammDto sammDto = (ProductStockSammDto) messageContentDto;
+                PartnerProductStockDto partnerProductStockDto =
+                        productStockSammMapper.fromSamm(sammDto);
+
+                // check whether a new PartnerProductStock must be created
+                // or whether an update is sufficient.
+                List<PartnerProductStock> existingPartnerProductStocks =
+                        partnerProductStockService.findAllByMaterialUuidAndPartnerUuid(
+                                partnerProductStockDto.getMaterial().getUuid(),
+                                partnerProductStockDto.getSupplierPartner().getUuid()
+                        );
+
+                // currently we only accept a one to one mapping of partner - material - stock -site
+                // therefore the can only be one PartnerProductStock
+                // if > 0 -> IllegalState
+                if (existingPartnerProductStocks.size() > 1) {
+                    throw new IllegalStateException(String.format("There exist %d " +
+                                    "PartnerProductStocks for material uuid %s and supplier partner uuid " +
+                                    "%s", existingPartnerProductStocks.size(),
+                            partnerProductStockDto.getMaterial().getUuid(),
+                            partnerProductStockDto.getSupplierPartner().getUuid()));
+                }
+
+                // Create or update
+                if (existingPartnerProductStocks.isEmpty()) {
+                    PartnerProductStock createdPartnerProductStock =
+                            partnerProductStockService.create(modelMapper.map(partnerProductStockDto,
+                                    PartnerProductStock.class));
+                    log.info(String.format("Created Partner ProductStock from SAMM: %s",
+                            createdPartnerProductStock));
+                } else {
+                    PartnerProductStock updatedPartnerProductStock =
+                            partnerProductStockService.update(existingPartnerProductStocks.get(0));
+                    log.info(String.format("Updated Partner ProductStock from SAMM: %s",
+                            updatedPartnerProductStock));
+                }
+            } else if (messageContentDto instanceof MessageContentErrorDto) {
+                log.error(String.format("Could not receive information: %s", messageContentDto));
+            } else
+                throw new IllegalStateException(String.format("Message Content is unknown: %s",
+                        messageContentDto));
+
+        }
+
+        // Update status - also only MessageContentErrorDtos would be completed
+        requestService.updateState(correspondingRequest, DT_RequestStateEnum.COMPLETED);
+    }
+
+    private Request findCorrespondingRequest(ResponseDto responseDto) {
+        UUID requestId = responseDto.getHeader().getRequestId();
+
+        Request requestFound =
+                requestService.findRequestByHeaderUuid(requestId);
+
+        if (requestFound == null) {
+            throw new RequestIdNotFoundException(requestId);
+        } else return requestFound;
+
     }
 
 }

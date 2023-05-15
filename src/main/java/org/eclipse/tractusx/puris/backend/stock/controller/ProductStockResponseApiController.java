@@ -38,7 +38,7 @@ public class ProductStockResponseApiController extends ResponseApiController {
         super(responseApiService);
     }
 
-    @PostMapping("request")
+    @PostMapping("response")
     public ResponseEntity postResponse(@RequestBody ProductStockResponseDto productStockResponseDto) {
         return super.postResponse(productStockResponseDto);
     }

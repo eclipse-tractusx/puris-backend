@@ -138,7 +138,10 @@ public class EdcAdapterService {
         JsonNode assetBody = objectMapper.valueToTree(createAssetDto);
         JsonNode policyBody =
                 EDCRequestBodyBuilder.buildPolicyRequestBody(assetId);
+        log.info(String.format("Policy Body: %s", policyBody.asText()));
         JsonNode contractBody = EDCRequestBodyBuilder.buildContractRequestBody(assetId);
+        log.info(String.format("Contract Body: %s", contractBody.asText()));
+
         success = success && sendEdcRequest(assetBody, "/data/assets").isSuccessful();
         log.info(String.format("Creation of asset was successfull: %b", success));
         success = success && sendEdcRequest(policyBody, "/data/policydefinitions").isSuccessful();
@@ -210,6 +213,7 @@ public class EdcAdapterService {
             }
             httpUrl = HttpUrl.parse(url);
         }
+        log.info(String.format("catalog request url: %s", httpUrl));
 
         var request = new Request.Builder()
                 .get()
@@ -237,6 +241,7 @@ public class EdcAdapterService {
                 .url(new URL(String.format("%s/%s", backendUrl, transferId)))
                 .header("Accept", "application/octet-stream")
                 .build();
+        log.info(String.format("BackendUrl: %s", request.urlString()));
         var response = CLIENT.newCall(request).execute();
         return response.body().string();
     }
@@ -252,10 +257,21 @@ public class EdcAdapterService {
     public String startNegotiation(String connectorAddress, String orderId) throws IOException {
         var negotiationRequestBody = EDCRequestBodyBuilder.buildNegotiationRequestBody(connectorAddress, orderId);
         var response = sendEdcRequest(negotiationRequestBody, "/data/contractnegotiations");
+
         return response.body().string();
     }
 
-    public String getNegotiationState(String connectorAddress, String negotiationId) throws IOException {
+    public String startNegotiation(String connectorAddress,
+                                   String contractDefinitionId, String assetId) throws IOException {
+        var negotiationRequestBody =
+                EDCRequestBodyBuilder.buildNegotiationRequestBody(connectorAddress,
+                        contractDefinitionId, assetId);
+        var response = sendEdcRequest(negotiationRequestBody, "/data/contractnegotiations");
+
+        return response.body().string();
+    }
+
+    public String getNegotiationState(String negotiationId) throws IOException {
         var response = sendEdcRequest("/data/contractnegotiations/" + negotiationId);
         return response.body().string();
     }
@@ -276,6 +292,11 @@ public class EdcAdapterService {
                                 String orderId) throws IOException {
         var transferNode = EDCRequestBodyBuilder.buildTransferRequestBody(transferId, connectorAddress, contractId, orderId);
         var response = sendEdcRequest(transferNode, "/data/transferprocess");
+        return response.body().string();
+    }
+
+    public String getTransferState(String transferId) throws IOException {
+        var response = sendEdcRequest("/data/transferprocess/" + transferId);
         return response.body().string();
     }
 
@@ -362,6 +383,7 @@ public class EdcAdapterService {
                 .header("Content-Type", "application/json")
                 .url("http://" + edcHost + ":" + dataPort + urlSuffix)
                 .build();
+        log.info(String.format("Send Request to url: %s", request.urlString()));
 
         return CLIENT.newCall(request).execute();
     }

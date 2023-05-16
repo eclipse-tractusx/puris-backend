@@ -154,6 +154,12 @@ public class DataInjectionCommandLineRunner implements CommandLineRunner {
         List<Material> productsFound = materialService.findAllProducts();
         log.info(String.format("Found Products: %s", productsFound));
 
+
+        centralControlUnitEntity =
+                materialService.findProductByMaterialNumberCustomer(centralControlUnitEntity.getMaterialNumberCustomer());
+        log.info(String.format("Found product by materialNumber customer: %s",
+                centralControlUnitEntity));
+
         customerPartnerEntity = partnerService.findByUuid(customerPartnerEntity.getUuid());
         log.info(String.format("Created supplier partner: %s", customerPartnerEntity));
         log.info(String.format("Relationship to product: %s",

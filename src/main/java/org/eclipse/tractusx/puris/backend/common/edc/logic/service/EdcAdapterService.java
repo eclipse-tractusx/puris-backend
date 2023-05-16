@@ -391,7 +391,7 @@ public class EdcAdapterService {
     }
 
     public String initializeProxyCall(String partnerIdsUrl,
-                                      String partnersAssetId, String partnerBpnl, Map<String,
+                                      String partnersAssetId, Map<String,
             String> filterProperties) {
 
         String catalog = null;
@@ -409,8 +409,7 @@ public class EdcAdapterService {
             //correspondingRequest = requestService.updateState(correspondingRequest,
             //        DT_RequestStateEnum.ERROR);
 
-            log.error(String.format("Catalog for %s for partner %s for request could not be reached.", partnerIdsUrl,
-                    partnerBpnl));
+            log.error(String.format("Catalog for %s could not be reached.", partnerIdsUrl));
             log.error(e.getMessage());
             throw new RuntimeException(e);
         }

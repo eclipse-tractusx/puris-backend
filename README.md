@@ -1,3 +1,8 @@
+# ARCHIVED
+
+> **Warning**
+This repository is archived and not active anymore! The latest version is available at [eclipse-tractusx/puris](https://github.com/eclipse-tractusx/puris).
+
 <div align="center">
   <h2 align="center">PURIS Backend</h2>
   The backend of the Catena-X Predictive Unit Real-Time Information Service (PURIS)
@@ -7,7 +12,6 @@
 - [Prerequirements](#prerequirements)
 - [Getting Started](#getting-started)
 - [License](#license)
-
 
 ## Prerequirements
 The following things are needed to start PURIS:
